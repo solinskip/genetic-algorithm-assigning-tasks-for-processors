@@ -1,9 +1,11 @@
 $(document).ready(function () {
-    const populationSize = 100; //number of population
+    const populationSize = 90; //number of population
     const eliteSize = 10;       //number of elite
+    const mutationProbability = 0.1;  //probability of mutation during reproduction
+    const maxTimeOfProcess = 100;
     let generation = 0;
 
-    let inputData = {
+    let inputDataa = {
         numberOfTasks: 8,       //number of task
         numberOfProcess: 3,     //number of processor
         tasks: {
@@ -57,6 +59,7 @@ $(document).ready(function () {
             },
         }
     };
+    let inputData = generateInputData(100, 10);
 
     $('#numberOfTasks').text(inputData.numberOfTasks);
     $('#numberOfProcess').text(inputData.numberOfProcess);
@@ -151,10 +154,12 @@ $(document).ready(function () {
         for (let i = 1; i <= inputData.numberOfTasks; i++) {
             if (Math.random() < 0.5) {
                 let task = findTaskByNumberTask(mother, i);
-                child[task.currentProcessor].push(mother[task.currentProcessor][task.currentTask]);
+                let processorMutation = mutation(task.currentProcessor);
+                child[processorMutation].push(mother[task.currentProcessor][task.currentTask]);
             } else {
                 let task = findTaskByNumberTask(father, i);
-                child[task.currentProcessor].push(father[task.currentProcessor][task.currentTask]);
+                let processorMutation = mutation(task.currentProcessor);
+                child[processorMutation].push(father[task.currentProcessor][task.currentTask]);
             }
         }
 
@@ -174,18 +179,45 @@ $(document).ready(function () {
         }
     }
 
+    function mutation(currentProcessor) {
+        let processor;
+
+        if (Math.random() < mutationProbability) {
+            processor = Math.floor(Math.random() * inputData.numberOfProcess);
+        } else {
+            processor = currentProcessor;
+        }
+
+        return processor;
+    }
+
+    function generateInputData(numberOfTasks = null, numberOfProcess = null) {
+        let initialData = {
+            numberOfTasks: numberOfTasks,
+            numberOfProcess: numberOfProcess,
+            tasks: []
+        };
+
+        for (let i = 1; i <= numberOfTasks; i++) {
+            let tasks = {};
+            tasks = Object.assign({}, {numberTask: i});
+
+            for (let j = 0; j < numberOfProcess; j++) {
+                tasks = Object.assign(tasks, {['timeOnProcessor' + j]: Math.floor(Math.random() * maxTimeOfProcess)});
+            }
+
+            initialData.tasks.push(tasks);
+        }
+
+        return initialData;
+    }
 
     let population = assignRandomTasksToProcessors(populationSize);
-    console.log('Losowanie przydzielenie zadań do procesorów:');
-    console.log(population);
-
     let elite = getEliteFromPopulation(population, eliteSize);
-    console.log('Wybranie elity:');
-    console.log(elite);
 
-    let crossedElements = crossingEliteElements(elite);
-    console.log('Skrzyżowane elementy:');
-    console.log(crossedElements);
-
-    console.log('Najlepszy czas na procesorze: ' + bestTimeOnProcessor(elite) + ' sek.');
+    for (generation; generation < 1000; generation++) {
+        let crossedElements = crossingEliteElements(elite);
+        let nextGeneration = getEliteFromPopulation(crossedElements, eliteSize);
+        console.log('Najlepszy czas na procesorze: ' + bestTimeOnProcessor(nextGeneration) + ' sek.');
+    }
 });
