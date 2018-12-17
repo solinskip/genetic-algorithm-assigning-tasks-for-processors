@@ -1,9 +1,12 @@
 $(document).ready(function () {
-    const populationSize = 90; //number of population
     const eliteSize = 10;       //number of elite
     const mutationProbability = 0.1;  //probability of mutation during reproduction
     const maxTimeOfProcess = 100;
+    const generationSize = 1;
     let generation = 0;
+    let bestTime = 0;
+    let worstTime = 0;
+
 
     let inputDataa = {
         numberOfTasks: 8,       //number of task
@@ -212,12 +215,28 @@ $(document).ready(function () {
         return initialData;
     }
 
+    $('#start').click(function () {
+
+    });
+
     let population = assignRandomTasksToProcessors(populationSize);
     let elite = getEliteFromPopulation(population, eliteSize);
 
-    for (generation; generation < 1000; generation++) {
+    bestTime = bestTimeOnProcessor(elite);
+    worstTime = bestTimeOnProcessor(elite);
+    console.log('Najszorszy czas na procesorze: ' + worstTime + ' sek.');
+
+    for (generation; generation < generationSize; generation++) {
+        console.log('Generacja: ' + generation);
         let crossedElements = crossingEliteElements(elite);
         let nextGeneration = getEliteFromPopulation(crossedElements, eliteSize);
-        console.log('Najlepszy czas na procesorze: ' + bestTimeOnProcessor(nextGeneration) + ' sek.');
+        let tmpTime = bestTimeOnProcessor(nextGeneration);
+        if (bestTime > tmpTime) {
+            bestTime = tmpTime;
+            console.log('Najlepszy czas na procesorze: ' + bestTime + ' sek.');
+        } else if (worstTime < tmpTime) {
+            worstTime = tmpTime;
+            console.log('Najszorszy czas na procesorze: ' + worstTime + ' sek.');
+        }
     }
 });

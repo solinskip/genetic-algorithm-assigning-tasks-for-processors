@@ -8,14 +8,77 @@
     <link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
 <body>
-<div class="container-fluid">
+<div class="container">
     <div class="row">
-        <div class="col-md-6">
-            <div class="float-left">Liczba zadań:&nbsp;</div><div id="numberOfTasks"></div>
-            <div class="float-left">Liczba procesów:&nbsp;</div><div id="numberOfProcess"></div>
+        <div class="col-12 display-4 text-center">
+            Problem przydziału zadań do wielu procesorów
         </div>
-        <div class="col-md-6">
-
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-lg-6 mb-4 border-right">
+            <h3 class="mb-4">Ustawienia początkowe:</h3>
+            <div class="form-row">
+                <div class="form-group col-sm-4 text-const">
+                    <label for="numberOfTasks">Liczba zadań:</label>
+                    <input type="text" id="numberOfTasks" class="form-control" value="100"
+                           placeholder="Podaj liczbe zadań...">
+                </div>
+                <div class="form-group col-sm-4 text-const">
+                    <label for="numberOfProcessors">Liczba procesorów:</label>
+                    <input type="text" id="numberOfProcessors" class="form-control" value="3"
+                           placeholder="Podaj liczbe procesorów...">
+                </div>
+                <div class="form-group col-sm-4 text-const">
+                    <label for="maxTimeOfProcess">Maks. czas zadania:</label>
+                    <input type="text" id="maxTimeOfProcess" class="form-control" value="100"
+                           placeholder="Podaj maksymalny czas zadania...">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-sm-4 text-const">
+                    <label for="populationSize">Liczebność populacji:</label>
+                    <input type="text" id="populationSize" class="form-control" value="100"
+                           placeholder="Podaj liczebność populacji...">
+                </div>
+                <div class="form-group col-sm-4 text-const">
+                    <label for="eliteSize">Liczebność elity:</label>
+                    <input type="text" id="eliteSize" class="form-control" value="3"
+                           placeholder="Podaj liczebność elity...">
+                </div>
+                <div class="form-group col-sm-4 text-const">
+                    <label for="mutationProbability">Szansa na mutacje:</label>
+                    <input type="text" id="mutationProbability" class="form-control" value="0.1"
+                           placeholder="Podaj szanse mutacji(0-1)...">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-sm-4 text-const">
+                    <label for="generationSize">Liczba generacji:</label>
+                    <input type="text" id="generationSize" class="form-control" value="100"
+                           placeholder="Podaj liczbe generacji...">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-center" style="width: 100%;">
+                    <button id="start" class="btn btn-success col-12" style="font-size: 18px;">Start</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h3 class="mb-4">Działanie programu:</h3>
+            <div class="row">
+                <div class="col-sm-4 text-const">Generacja</div>
+                <div class="col-sm-2 badge badge-info time">0</div>
+                <div class="col-sm-4 text-const">Optymalizacja</div>
+                <div class="col-sm-2 badge badge-warning time">0 sek.</div>
+            </div>
+            <div class="row justify-content-center align-items-center" style="height: 55px;">
+                <div class="col-sm-4 text-const">Najlepszy czas wyk.</div>
+                <div class="col-sm-2 badge badge-success time">0 sek.</div>
+                <div class="col-sm-4 text-const">Najgorszy czas wyk.</div>
+                <div class="col-sm-2 badge badge-danger time">0 sek.</div>
+            </div>
         </div>
     </div>
 </div>
