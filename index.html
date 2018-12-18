@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="jQuery/jquery.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css"/>
+    <script type="text/javascript" src="script.js"></script>
 </head>
 <body>
 <div class="container">
@@ -38,12 +39,12 @@
             <div class="form-row">
                 <div class="form-group col-sm-4 text-const">
                     <label for="populationSize">Liczebność populacji:</label>
-                    <input type="text" id="populationSize" class="form-control" value="100"
+                    <input type="text" id="populationSize" class="form-control" value="90"
                            placeholder="Podaj liczebność populacji...">
                 </div>
                 <div class="form-group col-sm-4 text-const">
                     <label for="eliteSize">Liczebność elity:</label>
-                    <input type="text" id="eliteSize" class="form-control" value="3"
+                    <input type="text" id="eliteSize" class="form-control" value="10"
                            placeholder="Podaj liczebność elity...">
                 </div>
                 <div class="form-group col-sm-4 text-const">
@@ -60,8 +61,13 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col text-center" style="width: 100%;">
-                    <button id="start" class="btn btn-success col-12" style="font-size: 18px;">Start</button>
+                <div class="text-center" style="width: 100%;">
+                    <button id="start" class="btn btn-success col-sm-5 float-left mx-3" onclick="start();"
+                            style="font-size: 18px;">Start
+                    </button>
+                    <button id="stop" class="btn btn-danger col-sm-5 float-right mx-3" onclick="stop();"
+                            style="font-size: 18px;">Stop
+                    </button>
                 </div>
             </div>
         </div>
@@ -69,19 +75,26 @@
             <h3 class="mb-4">Działanie programu:</h3>
             <div class="row">
                 <div class="col-sm-4 text-const">Generacja</div>
-                <div class="col-sm-2 badge badge-info time">0</div>
-                <div class="col-sm-4 text-const">Optymalizacja</div>
-                <div class="col-sm-2 badge badge-warning time">0 sek.</div>
+                <div id="generation" class="col-sm-2 badge badge-info time">0</div>
             </div>
             <div class="row justify-content-center align-items-center" style="height: 55px;">
-                <div class="col-sm-4 text-const">Najlepszy czas wyk.</div>
-                <div class="col-sm-2 badge badge-success time">0 sek.</div>
                 <div class="col-sm-4 text-const">Najgorszy czas wyk.</div>
-                <div class="col-sm-2 badge badge-danger time">0 sek.</div>
+                <div id="worstTime" class="col-sm-2 badge badge-danger time">0 sek.</div>
+                <div class="col-sm-4 text-const">Najlepszy czas wyk.</div>
+                <div id="bestTime" class="col-sm-2 badge badge-success time">0 sek.</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 text-const">Optymalizacja</div>
+                <div id="optimization" class="col-sm-2 badge badge-warning time text-light  mr-4">0 sek.</div>
+                <div class="col-sm-5">
+                    <div class="progress align-content-center" style="height: 25px;">
+                        <div id="progressBar" class="progress-bar bg-warning text-const" role="progressbar"
+                             style="width: 0%; font-weight: bold"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 </body>
 </html>
-<script type="text/javascript" src="script.js"></script>
