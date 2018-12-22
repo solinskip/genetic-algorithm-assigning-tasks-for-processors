@@ -321,6 +321,7 @@ function start() {
 
     //save result to array for chart
     bestTimeTab.push(bestTime);
+    generationTab.push(generation);
 
     //stop condition
     if (threadId != -1) {
