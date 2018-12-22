@@ -11,10 +11,12 @@ let mutationProbability;
 let crossedElements;
 let nextGeneration;
 let bestTime = 0;
+let bestTimeTab = [];
 let worstTime = 0;
 let optimization = 0;
 let progressbar;
 let generation = 0;
+let generationTab = [];
 let generationSize;
 
 function assignRandomTasksToProcessors(populationSize = null) {
@@ -165,6 +167,7 @@ function generateInputData(numberOfTasks = null, numberOfProcess = null) {
 
 function stop() {
     clearInterval(threadId);
+    window.myLine.update();
 }
 
 function main() {
@@ -177,6 +180,8 @@ function main() {
 
     if (bestTime > tmpTime) {
         bestTime = tmpTime;
+        generationTab.push(generation);
+        bestTimeTab.push(bestTime);
         optimization = worstTime - bestTime;
         progressbar = ((bestTime * 100) / worstTime).toFixed(2);
         progressbar = 100 - parseInt(progressbar);
@@ -223,9 +228,64 @@ function start() {
     bestTime = bestTimeOnProcessor(elite);
     worstTime = bestTimeOnProcessor(elite);
 
+    bestTimeTab.push(bestTime);
+
     if (threadId != -1) {
         stop();
     }
 
     threadId = setInterval("main()", 0);
 }
+
+//config for chartJS
+let config = {
+    type: 'line',
+    data: {
+        labels: generationTab,
+        datasets: [{
+            label: 'Czas wykonania(sek)',
+            backgroundColor: '#ffc107',
+            borderColor: '#ffc107',
+            data: bestTimeTab,
+            fill: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        title: {
+            display: true,
+            text: 'Historia najlepszych wyników',
+            fontSize: 18,
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+        },
+        hover: {
+            mode: 'nearest',
+            intersect: true
+        },
+        scales: {
+            xAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Generacja'
+                }
+            }],
+            yAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Najlepsze czasy wykonania'
+                }
+            }]
+        }
+    }
+};
+
+//draw chart in canvas field
+window.onload = function() {
+    let ctx = document.getElementById('canvas').getContext('2d');
+    window.myLine = new Chart(ctx, config);
+};
