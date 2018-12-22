@@ -1,3 +1,4 @@
+//initial variables
 let threadId = -1;
 let inputData;
 let population;
@@ -19,10 +20,17 @@ let generation = 0;
 let generationTab = [];
 let generationSize;
 
+/**
+ * Assign random tasks to processors
+ *
+ * @param populationSize integer
+ * @returns {Array}
+ */
 function assignRandomTasksToProcessors(populationSize = null) {
     let result = [];
 
     for (let i = 0; i < populationSize; i++) {
+        //creates an object, size depends on the number of processes
         let processorTasks = createTaskAllocationArray();
 
         for (let key in inputData.tasks) {
@@ -35,15 +43,25 @@ function assignRandomTasksToProcessors(populationSize = null) {
     return result;
 }
 
+/**
+ * Selects the  best times from the population
+ *
+ * @param population integer
+ * @param eliteSize integer
+ * @returns {Array}
+ */
 function getEliteFromPopulation(population, eliteSize = null) {
     let elite = [];
 
     for (let currentPopulation = 0; currentPopulation < populationSize; currentPopulation++) {
+        //first 10 result save as elite
         if (currentPopulation < eliteSize) {
             elite.push(population[currentPopulation]);
         } else {
             elite.forEach(function (el, i, arr) {
+                //compare execute task time and ascribe to elite if time is best than worst time in elite
                 if (timeOnProcessor(population[currentPopulation]) < timeOnProcessor(el)) {
+                    //removing the worst time
                     arr.splice(i, 1);
                     arr.push(population[currentPopulation]);
                 }
@@ -54,6 +72,12 @@ function getEliteFromPopulation(population, eliteSize = null) {
     return elite;
 }
 
+/**
+ * Calculate the worst time execute task on processors
+ *
+ * @param currentPopulation object
+ * @returns integer
+ */
 function timeOnProcessor(currentPopulation = null) {
     let time = [];
     for (let currentProcessor = 0; currentProcessor < inputData.numberOfProcess; currentProcessor++) {
@@ -63,9 +87,16 @@ function timeOnProcessor(currentPopulation = null) {
         }
     }
 
+    //return the worst time execute task on processors
     return time.reduce((a, b) => a + b);
 }
 
+/**
+ * Select the best time execute task from elite
+ *
+ * @param elite object
+ * @returns integer
+ */
 function bestTimeOnProcessor(elite) {
     let bestTime = timeOnProcessor(elite['0']);
 
@@ -78,6 +109,12 @@ function bestTimeOnProcessor(elite) {
     return bestTime;
 }
 
+/**
+ * Crossing each of each elite elements, return next population
+ *
+ * @param elite object
+ * @returns Array
+ */
 function crossingEliteElements(elite = null) {
     let nextPopulation = [];
 
@@ -92,6 +129,11 @@ function crossingEliteElements(elite = null) {
     return nextPopulation;
 }
 
+/**
+ * Create object, size depend on the number of process
+ *
+ * @return Array
+ */
 function createTaskAllocationArray() {
     let array = {};
     for (let i = 0; i < inputData.numberOfProcess; i++) {
@@ -101,13 +143,23 @@ function createTaskAllocationArray() {
     return array;
 }
 
+/**
+ * Creation of a child from mother and father through crossing them
+ *
+ * @param mother object
+ * @param father object
+ * @return Object
+ */
 function reproduction(mother = null, father = null) {
     let child = createTaskAllocationArray();
 
+    //if random number is smaller than 0.5 then take assign task to processor from mother else from father
     for (let i = 1; i <= inputData.numberOfTasks; i++) {
         if (Math.random() < 0.5) {
             let task = findTaskByNumberTask(mother, i);
+            //mutation child
             let processorMutation = mutation(task.currentProcessor);
+            //create child
             child[processorMutation].push(mother[task.currentProcessor][task.currentTask]);
         } else {
             let task = findTaskByNumberTask(father, i);
@@ -119,6 +171,13 @@ function reproduction(mother = null, father = null) {
     return child;
 }
 
+/**
+ * Find task by number task
+ *
+ * @param parent object
+ * @param i integer
+ * @return object
+ */
 function findTaskByNumberTask(parent, i) {
     for (let currentProcessor = 0; currentProcessor < inputData.numberOfProcess; currentProcessor++) {
         for (let currentTask in parent[currentProcessor]) {
@@ -132,9 +191,16 @@ function findTaskByNumberTask(parent, i) {
     }
 }
 
+/**
+ * Mutation child
+ *
+ * @param currentProcessor object
+ * @return integer
+ */
 function mutation(currentProcessor) {
     let processor;
 
+    //if random number is smaller than mutation probability then assign random number of processor else leave current processor unchanged
     if (Math.random() < mutationProbability) {
         processor = Math.floor(Math.random() * inputData.numberOfProcess);
     } else {
@@ -144,6 +210,13 @@ function mutation(currentProcessor) {
     return processor;
 }
 
+/**
+ * Generate input data to optimization
+ *
+ * @param numberOfTasks integer
+ * @param numberOfProcess integer
+ * @return object
+ */
 function generateInputData(numberOfTasks = null, numberOfProcess = null) {
     let initialData = {
         numberOfTasks: numberOfTasks,
@@ -151,6 +224,7 @@ function generateInputData(numberOfTasks = null, numberOfProcess = null) {
         tasks: []
     };
 
+    //generate tasks, size depend of number of tasks and number od processors
     for (let i = 1; i <= numberOfTasks; i++) {
         let tasks = {};
         tasks = Object.assign({}, {numberTask: i});
@@ -165,11 +239,17 @@ function generateInputData(numberOfTasks = null, numberOfProcess = null) {
     return initialData;
 }
 
+/**
+ * Stop working script and update chart
+ */
 function stop() {
     clearInterval(threadId);
     window.myLine.update();
 }
 
+/**
+ * Main function of script
+ */
 function main() {
     $('#generation').text(generation++);
     crossedElements = crossingEliteElements(elite);
@@ -186,6 +266,7 @@ function main() {
         progressbar = ((bestTime * 100) / worstTime).toFixed(2);
         progressbar = 100 - parseInt(progressbar);
 
+        //update fields in frontend
         $('#bestTime').text(bestTime + ' sek.');
         $('#optimization').text(optimization + ' sek.');
         $('#progressBar').text(progressbar + '%');
@@ -196,6 +277,7 @@ function main() {
         progressbar = ((bestTime * 100) / worstTime).toFixed(2);
         progressbar = 100 - parseInt(progressbar);
 
+        //update fields in frontend
         $('#worstTime').text(worstTime + ' sek.');
         $('#optimization').text(optimization + ' sek.');
         $('#progressBar').text(progressbar + '%');
@@ -203,7 +285,11 @@ function main() {
     }
 }
 
+/**
+ * Start function
+ */
 function start() {
+    //assigning initial variables form frontend
     numberOfTasks = $('#numberOfTasks').val();
     numberOfProcess = $('#numberOfProcessors').val();
     maxTimeOfProcess = $('#maxTimeOfProcess').val();
@@ -211,8 +297,9 @@ function start() {
     eliteSize = $('#eliteSize').val();
     mutationProbability = $('#mutationProbability').val();
     generationSize = $('#generationSize').val();
-    generation = 0;
 
+    //resetting variables
+    generation = 0;
     $('#generation').text('0');
     $('#bestTime').text('0 sek.');
     $('#worstTime').text('0 sek.');
@@ -220,20 +307,27 @@ function start() {
     $('#progressBar').text('0%');
     $('#progressBar').css('width', '0%');
 
+    //generate input data to optimization
     inputData = generateInputData(numberOfTasks, numberOfProcess);
 
+    //create first(random) population from initial data
     population = assignRandomTasksToProcessors(populationSize);
+    //get elite from population
     elite = getEliteFromPopulation(population, eliteSize);
 
+    //get the best time on processor first elite
     bestTime = bestTimeOnProcessor(elite);
     worstTime = bestTimeOnProcessor(elite);
 
+    //save result to array for chart
     bestTimeTab.push(bestTime);
 
+    //stop condition
     if (threadId != -1) {
         stop();
     }
 
+    //looping function "main()", this method allows refreshing the content of frontend elements during the execution of the script
     threadId = setInterval("main()", 0);
 }
 
@@ -285,7 +379,7 @@ let config = {
 };
 
 //draw chart in canvas field
-window.onload = function() {
+window.onload = function () {
     let ctx = document.getElementById('canvas').getContext('2d');
     window.myLine = new Chart(ctx, config);
 };
