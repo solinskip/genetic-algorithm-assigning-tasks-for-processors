@@ -13,12 +13,17 @@ let crossedElements;
 let nextGeneration;
 let bestTime = 0;
 let bestTimeTab = [];
+let bestTimeTabExecuteTime = ['00:00:00'];
 let worstTime = 0;
 let optimization = 0;
 let progressbar;
 let generation = 0;
 let generationTab = [];
 let generationSize;
+let startTime;
+let displayHour = 0;
+let displayMinute = 0;
+let displaySecond = 0;
 
 /**
  * Assign random tasks to processors
@@ -73,7 +78,7 @@ function getEliteFromPopulation(population, eliteSize = null) {
 }
 
 /**
- * Calculate the worst time execute task on processors
+ * Calculate execute task time on processors
  *
  * @param currentPopulation object
  * @returns integer
@@ -87,7 +92,7 @@ function timeOnProcessor(currentPopulation = null) {
         }
     }
 
-    //return the worst time execute task on processors
+    //return execute task time on processors
     return time.reduce((a, b) => a + b);
 }
 
@@ -240,17 +245,58 @@ function generateInputData(numberOfTasks = null, numberOfProcess = null) {
 }
 
 /**
- * Stop working script and update chart
+ * Adding zero to the number if number is less than 10
+ *
+ * @param num integer
+ * @return object
  */
-function stop() {
-    clearInterval(threadId);
-    window.myLine.update();
+function prettyTimeString(num) {
+    return (num < 10 ? "0" : "") + num;
+}
+
+/**
+ * Calculating execution time of the script
+ *
+ * @return {{hour: *, minute: *, second: *}}
+ */
+function stopwatch() {
+    let currentTime = new Date();
+    //execution script time in milliseconds
+    let totalMilliseconds = currentTime - startTime;
+
+    let currentHour = Math.floor(totalMilliseconds / 360000000);
+    totalMilliseconds = totalMilliseconds % 360000000;
+
+    let currentMinute = Math.floor(totalMilliseconds / 60000);
+    totalMilliseconds = totalMilliseconds % 60000;
+
+    let currentSecond = Math.floor(totalMilliseconds / 1000);
+
+    if (displayHour != currentHour) {
+        $('#hour').text(prettyTimeString(currentHour));
+        displayHour = currentHour;
+    }
+    if (displayMinute != currentMinute) {
+        $('#minute').text(prettyTimeString(currentMinute));
+        displayMinute = currentMinute;
+    }
+    if (displaySecond != currentSecond) {
+        $('#second').text(prettyTimeString(currentSecond));
+        displaySecond = currentSecond;
+    }
+
+    return {
+        hour: prettyTimeString(currentHour),
+        minute: prettyTimeString(currentMinute),
+        second: prettyTimeString(currentSecond)
+    };
 }
 
 /**
  * Main function of script
  */
 function main() {
+    let stopwatchTime = stopwatch();
     $('#generation').text(generation++);
     crossedElements = crossingEliteElements(elite);
     nextGeneration = getEliteFromPopulation(crossedElements, eliteSize);
@@ -262,6 +308,7 @@ function main() {
         bestTime = tmpTime;
         generationTab.push(generation);
         bestTimeTab.push(bestTime);
+        bestTimeTabExecuteTime.push(stopwatchTime.hour + ':' + stopwatchTime.minute + ':' + stopwatchTime.second);
         optimization = worstTime - bestTime;
         progressbar = ((bestTime * 100) / worstTime).toFixed(2);
         progressbar = 100 - parseInt(progressbar);
@@ -297,10 +344,14 @@ function start() {
     eliteSize = $('#eliteSize').val();
     mutationProbability = $('#mutationProbability').val();
     generationSize = $('#generationSize').val();
+    startTime = new Date();
 
     //resetting variables
     generation = 0;
     $('#generation').text('0');
+    $('#hh').text('00');
+    $('#mm').text('00');
+    $('#ss').text('00');
     $('#bestTime').text('0 sek.');
     $('#worstTime').text('0 sek.');
     $('#optimization').text('0 sek.');
@@ -332,6 +383,15 @@ function start() {
     threadId = setInterval("main()", 0);
 }
 
+
+/**
+ * Stop working script and update chart
+ */
+function stop() {
+    clearInterval(threadId);
+    window.myLine.update();
+}
+
 //config for chartJS
 let config = {
     type: 'line',
@@ -353,7 +413,17 @@ let config = {
             fontSize: 18,
         },
         tooltips: {
-            mode: 'index',
+            callbacks: {
+                title: function (tooltipItem) {
+                    return 'Generacja: ' + tooltipItem['0']['xLabel'];
+                },
+                label: function (tooltipItem) {
+                    return 'Czas wykonania: ' + tooltipItem['yLabel'] + ' sek.';
+                },
+                afterLabel: function (tooltipItem) {
+                    return 'W czasie: ' + bestTimeTabExecuteTime[tooltipItem['index']];
+                }
+            },
             intersect: false,
         },
         hover: {
