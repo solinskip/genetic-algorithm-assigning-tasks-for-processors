@@ -13,7 +13,7 @@ let crossedElements;
 let nextGeneration;
 let bestTime = 0;
 let bestTimeTab = [];
-let bestTimeTabExecuteTime = ['00:00:00'];
+let bestTimeTabExecuteTime = [];
 let worstTime = 0;
 let optimization = 0;
 let progressbar;
@@ -348,6 +348,7 @@ function start() {
 
     //resetting variables
     generation = 0;
+    bestTimeTabExecuteTime.push('00:00:00');
     $('#generation').text('0');
     $('#hh').text('00');
     $('#mm').text('00');
